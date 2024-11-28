@@ -41,7 +41,7 @@ $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <?php echo htmlspecialchars(substr($article['contenu'], 0, 150)); ?>...
                         </p>
                         <p class="lead mb-0">
-                            <a href="details_article.php?id=<?php echo $article['id']; ?>" class="text-body-emphasis fw-bold">Continue reading...</a>
+                            <a href="./pages/details_article.php?id=<?php echo $article['id']; ?>" class="text-body-emphasis fw-bold">Continue reading...</a>
                         </p>
                     </div>
                 </div>

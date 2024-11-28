@@ -80,7 +80,7 @@ try {
                         <p class="card-text">
                             <?= htmlspecialchars(substr($article['contenu'], 0, 90)) . '...' ?>
                         </p>
-                        <a href="article.php?id=<?= $article['article_id'] ?>" class="icon-link gap-1 icon-link-hover stretched-link">
+                        <a href="./pages/details_article.php?id=<?= $article['article_id'] ?>" class="icon-link gap-1 icon-link-hover stretched-link">
                             Continue reading
                             <svg class="bi"><use xlink:href="#chevron-right"/></svg>
                         </a>
