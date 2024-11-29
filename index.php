@@ -28,7 +28,7 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name ASC")->fetchAl
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
-<title>Blog</title>
+<title>Blog sterna africa</title>
 <link rel="canonical" href="">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">
 <link href="./assets/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -120,14 +120,14 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name ASC")->fetchAl
 <div class="container">
   <header class="border-bottom lh-1 py-3">
     <div class="row flex-nowrap justify-content-between align-items-center">
-      <div class="col-4 text-left">
-        <a class="blog-header-logo text-body-emphasis text-decoration-none" href="#">Blog</a>
+      <div class="col-6 text-left">
+        <a class="blog-header-logo text-body-emphasis text-decoration-none" href="#" translate="no">Blog sterna</a>
       </div>
-      <div class="col-8 d-flex justify-content-end align-items-center">
+      <div class="col-6 d-flex justify-content-end align-items-center">
         <a class="link-secondary" href="#" aria-label="Search">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img" viewBox="0 0 24 24"><title>Search</title><circle cx="10.5" cy="10.5" r="7.5"/><path d="M21 21l-5.2-5.2"/></svg>
         </a>
-        <a class="btn btn-sm btn-outline-secondary" href="./users/login.php">Sign up</a>
+        <a class="btn btn-sm btn-outline-secondary" href="./users/login.php">Login</a>
       </div>
     </div>
   </header>

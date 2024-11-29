@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-// Vérifier si l'utilisateur est connecté
-if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php'); // Redirige vers la page de connexion si non connecté
-    exit();
-}
+// // Vérifier si l'utilisateur est connecté et s'il est un administrateur
+// if (!isset($_SESSION['user_id']) || !isset($_SESSION['role']) || $_SESSION['role'] !== 'admin') {
+//     header('Location: admin_login.php'); // Redirige vers la page de connexion si non connecté ou non admin
+//     exit();
+// }
 
 // Connexion à la base de données
 $host = 'localhost';
@@ -30,13 +30,13 @@ if (!isset($_GET['id'])) {
 
 $article_id = $_GET['id'];
 
-// Récupérer l'article à modifier
-$stmt = $pdo->prepare("SELECT * FROM articles WHERE id = ? AND auteur = ?");
-$stmt->execute([$article_id, $_SESSION['username']]);
+// Récupérer l'article à modifier (aucune restriction pour un administrateur)
+$stmt = $pdo->prepare("SELECT * FROM articles WHERE id = ?");
+$stmt->execute([$article_id]);
 $article = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$article) {
-    die('Article introuvable ou vous n\'êtes pas l\'auteur de cet article');
+    die('Article introuvable.');
 }
 
 // Traitement de la modification
@@ -74,10 +74,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $update_stmt = $pdo->prepare("UPDATE articles SET titre = ?, contenu = ?, date_publication = ?, categorie = ?, image_upload = ? WHERE id = ?");
     $update_stmt->execute([$titre, $contenu, $date_publication, $categorie, $image_url, $article_id]);
 
-    header('Location: dashboard.php'); // Redirige vers le tableau de bord après modification
+    header('Location: admin_dashboard.php'); // Redirige vers le tableau de bord après modification
     exit();
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -104,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h5 class="mb-0">Informations de l'article</h5>
         </div>
         <div class="card-body">
-            <form action="edit_article.php?id=<?php echo $article['id']; ?>" method="POST" enctype="multipart/form-data">
+            <form action="edit_article.php?id=<?php echo htmlspecialchars($article['id']); ?>" method="POST" enctype="multipart/form-data">
                 <div class="row">
                     <!-- Titre -->
                     <div class="mb-3 col-md-4">
@@ -143,7 +144,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="mb-3 col-md-6">
                         <label class="form-label">Image actuelle :</label><br>
                         <?php if (!empty($article['image_upload'])): ?>
-                            <img src="<?php echo '../' . $article['image_upload']; ?>" alt="Image de l'article" class="img-thumbnail" style="max-width: 150px;"><br>
+                            <img src="<?php echo '../' . htmlspecialchars($article['image_upload']); ?>" alt="Image de l'article" class="img-thumbnail" style="max-width: 150px;"><br>
                         <?php else: ?>
                             <span class="text-muted">Pas d'image disponible</span><br>
                         <?php endif; ?>
@@ -158,7 +159,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <!-- Bouton de soumission -->
                 <div class="d-flex justify-content-between">
-                    <a href="dashboard.php" class="btn btn-secondary">Retour au tableau de bord</a>
+                    <a href="admin_dashboard.php" class="btn btn-secondary">Retour au tableau de bord</a>
                     <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
                 </div>
             </form>
@@ -186,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ['color', ['color']],
                 ['para', ['ul', 'ol', 'paragraph']],
                 ['table', ['table']],
-                ['insert', ['link', 'picture', 'video', 'emoji']], // Emoji et insertion de médias
+                ['insert', ['link', 'picture', 'video', 'emoji']],
                 ['view', ['fullscreen', 'codeview', 'help']]
             ]
         });

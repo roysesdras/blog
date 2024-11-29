@@ -45,11 +45,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration</title>
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
 
+<style>
+    button{
+        padding: 8px;
+        border: solid 1px #37cb;
+        border-radius: 5px;
+        background-color: #37cb;
+    }
+</style>
+
+<body data-bs-theme="dark">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+                <h2 class="pt-5 pb-4">Registration</h2>
+                    <form method="POST">
+                        <input type="text" name="username" placeholder="User name" class="form-control mb-3" required>
+
+                        <input type="email" name="email" placeholder="E-mail" class="form-control mb-3" required>
+
+                        <input type="password" name="password" placeholder="Password" class="form-control mb-4" required>
+
+                        <button type="submit">Sing up</button>
+                    </form>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+    </div>
+    
+</body>
+</html>
 <!-- Formulaire d'inscription -->
-<form method="POST">
-    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
-    <input type="email" name="email" placeholder="Email" required>
-    <input type="password" name="password" placeholder="Mot de passe" required>
-    <button type="submit">S'inscrire</button>
-</form>
+

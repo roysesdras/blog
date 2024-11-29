@@ -1,4 +1,12 @@
 <?php
+session_start();
+
+// Vérifier si l'utilisateur est connecté
+if (!isset($_SESSION['user_id'])) {
+    header('Location: login.php'); // Redirige vers la page de connexion si non connecté
+    exit();
+}
+
 // Connexion à la base de données
 $host = 'localhost';
 $db = 'blog_sterna';
@@ -6,30 +14,80 @@ $user = 'roys_web';
 $pass = '@roys';
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
+    $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Erreur de connexion : " . $e->getMessage());
 }
 
-// Récupération de l'article à afficher
+// Récupération des catégories
+$categories = $pdo->query("SELECT id, name FROM categories")->fetchAll(PDO::FETCH_KEY_PAIR);
+
+// Récupérer l'ID de l'article à modifier
 if (!isset($_GET['id'])) {
-    die('ID d\'article non spécifié.');
+    die('ID d\'article non spécifié');
 }
 
 $article_id = $_GET['id'];
-$stmt = $pdo->prepare("
-    SELECT titre, contenu, date_publication, auteur, image_upload
-    FROM articles
-    WHERE id = ? AND status = 'publié'
-");
-$stmt->execute([$article_id]);
+
+// Récupérer l'article à modifier
+if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] === true) {
+    // Si l'utilisateur est admin, récupérer l'article sans condition d'auteur
+    $stmt = $pdo->prepare("SELECT * FROM articles WHERE id = ?");
+    $stmt->execute([$article_id]);
+} else {
+    // Si l'utilisateur est un utilisateur classique, vérifier qu'il est l'auteur de l'article
+    $stmt = $pdo->prepare("SELECT * FROM articles WHERE id = ? AND auteur = ?");
+    $stmt->execute([$article_id, $_SESSION['username']]);
+}
+
 $article = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$article) {
-    die('Article introuvable ou non approuvé.');
+    die('Article introuvable ou vous n\'êtes pas autorisé à modifier cet article');
+}
+
+// Traitement de la modification
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $titre = $_POST['titre'];
+    $contenu = $_POST['contenu'];
+    $date_publication = $_POST['date_publication'];
+    $categorie = $_POST['categorie'];
+
+    $image_url = $article['image_upload']; // Garder l'image actuelle par défaut
+
+    // Traitement de l'upload de l'image
+    if (isset($_FILES['image_upload']) && $_FILES['image_upload']['error'] == UPLOAD_ERR_OK) {
+        $upload_dir = '../uploads/';
+        $file_name = basename($_FILES['image_upload']['name']);
+        $file_path = $upload_dir . $file_name;
+
+        // Validation : vérifier l'extension du fichier
+        $allowed_extensions = ['jpg', 'jpeg', 'png', 'gif'];
+        $file_extension = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+
+        if (!in_array($file_extension, $allowed_extensions)) {
+            die('Type de fichier non autorisé. Seules les images JPG, JPEG, PNG et GIF sont acceptées.');
+        }
+
+        // Déplacer le fichier uploadé
+        if (move_uploaded_file($_FILES['image_upload']['tmp_name'], $file_path)) {
+            $image_url = str_replace('../', '', $file_path); // Stocker un chemin relatif
+        } else {
+            die('Échec du téléchargement de l\'image.');
+        }
+    }
+
+    // Mise à jour de l'article dans la base de données
+    $update_stmt = $pdo->prepare("UPDATE articles SET titre = ?, contenu = ?, date_publication = ?, categorie = ?, image_upload = ? WHERE id = ?");
+    $update_stmt->execute([$titre, $contenu, $date_publication, $categorie, $image_url, $article_id]);
+
+    header('Location: admin_dashboard.php'); // Redirige vers le tableau de bord après modification
+    exit();
 }
 ?>
+
+
 
 <!doctype html>
 <html lang="en" data-bs-theme="auto">
@@ -79,7 +137,7 @@ if (!$article) {
                 <?php endif; ?>
 
                 <div class="article-content">
-                    <p><?php echo nl2br(htmlspecialchars($article['contenu'])); ?></p>
+                    <p><?php echo nl2br(($article['contenu'])); ?></p>
                 </div>
 
                 <?php 

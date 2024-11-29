@@ -72,106 +72,178 @@ $articles->execute([$user_id]);
 $articles = $articles->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<h1>Bienvenue, <?php echo $_SESSION['username']; ?> !</h1>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Bord</title>
+    <!-- Lien vers Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- CSS Summernote -->
+    <link href="https://cdn.jsdelivr.net/npm/summernote/dist/summernote-lite.min.css" rel="stylesheet">
+    
+    <link rel="stylesheet" href="../sum.css">
+    <style>
+        .contenu-preview span {
+            display: block;
+        }
+        .contenu-preview .contenu-complet {
+            display: none;
+        }
+        /* Personnalisation pour le mode sombre */
+        .note-editor {
+            background-color: #343a40; /* Couleur de fond sombre */
+            color: #ffffff; /* Couleur de texte claire */
+        }
+    </style>
+</head>
+<body data-bs-theme="dark">
 
-<!-- Formulaire d'ajout d'article -->
-<form action="" method="POST" enctype="multipart/form-data">
-    <label for="titre">Titre de l'article :</label>
-    <input type="text" name="titre" required>
-    
-    <label for="contenu">Contenu de l'article :</label>
-    <textarea name="contenu" required></textarea>
-    
-    <label for="date_publication">Date de publication :</label>
-    <input type="datetime-local" name="date_publication">
-    
-    <label for="categorie">Catégorie :</label>
-    <select name="categorie" required>
-        <option value="">-- Choisissez une catégorie --</option>
-        <?php foreach ($categories as $category): ?>
-            <option value="<?php echo $category['id']; ?>"><?php echo $category['name']; ?></option>
-        <?php endforeach; ?>
-    </select>
-    
-    <label for="auteur">Auteur :</label>
-    <input type="text" name="auteur" value="<?php echo $_SESSION['username']; ?>" readonly>
-    
-    <label for="image_upload">Téléchargez une image :</label>
-    <input type="file" name="image_upload" accept="image/*">
-    
-    <button type="submit">Ajouter l'article</button>
-</form>
+<div class="container-fluid py-5">
+    <!-- Titre de bienvenue -->
+    <div class="text-center mb-4">
+        <h1 class="fw-bold">Bienvenue, <?php echo $_SESSION['username']; ?> !</h1>
+    </div>
 
-<!-- Tableau des articles -->
-<h2>Vos articles</h2>
-<table border="1">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Titre</th>
-            <th>Image</th>
-            <th>Contenu</th>
-            <th>Catégorie</th>
-            <th>Date de publication</th>
-            <th>Statut</th>
-            <th>Action</th>
-        </tr>
-    </thead>
-    <tbody>
-        <?php foreach ($articles as $article): ?>
-            <tr>
-                <td><?php echo $article['id']; ?></td>
-                <td><?php echo $article['titre']; ?></td>
-                <td>
-                    <?php if ($article['image_upload']): ?>
-                        <img src="<?php echo '../' . $article['image_upload']; ?>" alt="Image de l'article" width="100">
-                    <?php else: ?>
-                        Pas d'image
-                    <?php endif; ?>
-                </td>
-                <td>
-                    <span class="contenu-preview">
-                        <?php echo substr($article['contenu'], 0, 500); ?>
-                        <?php if (strlen($article['contenu']) > 500): ?>
-                            <a href="#" class="lire-plus" data-id="<?php echo $article['id']; ?>">Lire plus</a>
-                            <span class="contenu-complet" style="display: none;"><?php echo $article['contenu']; ?></span>
-                            <a href="#" class="lire-moins" style="display: none;">Lire moins</a>
-                        <?php endif; ?>
-                    </span>
-                </td>
-                <td><?php echo $article['categorie']; ?></td>
-                <td><?php echo $article['date_publication']; ?></td>
-                <td><?php echo $article['status']; ?></td>
-                <td>
-                    <!-- Lien vers la page de modification -->
-                    <a href="edit_article.php?id=<?php echo $article['id']; ?>">Modifier</a>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-    </tbody>
-</table>
+    <!-- Formulaire d'ajout d'article -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Ajouter un nouvel article</h5>
+        </div>
+        <div class="card-body">
+            <form action="" method="POST" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="mb-3 col-md-4">
+                        <label for="titre" class="form-label">Titre de l'article</label>
+                        <input type="text" class="form-control bg-dark" name="titre" required>
+                    </div>
 
+                    <div class="mb-3 col-md-4">
+                        <label for="date_publication" class="form-label">Date de publication</label>
+                        <input type="datetime-local" class="form-control bg-dark" name="date_publication">
+                    </div>
 
-<a href="logout.php">Se déconnecter</a>
+                    <div class="mb-3 col-md-4">
+                        <label for="categorie" class="form-label">Catégorie</label>
+                        <select class="form-select bg-dark" name="categorie" required>
+                            <option value="">-- Choisissez une catégorie --</option>
+                            <?php foreach ($categories as $category): ?>
+                                <option value="<?php echo $category['id']; ?>"><?php echo htmlspecialchars($category['name']); ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="mb-3 col-md-6">
+                        <label for="auteur" class="form-label">Auteur</label>
+                        <input type="text" class="form-control bg-dark" name="auteur" value="<?php echo $_SESSION['username']; ?>" readonly>
+                    </div>
+
+                    <div class="mb-3 col-md-6">
+                        <label for="image_upload" class="form-label">Téléchargez une image</label>
+                        <input type="file" class="form-control bg-dark" name="image_upload" accept="image/*">
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="contenu" class="form-label">Contenu de l'article</label>
+                    <textarea class="form-control bg-dark" name="contenu" id="summernote" rows="5" required>
+
+                    </textarea>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Ajouter l'article</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Tableau des articles -->
+    <div class="card shadow">
+        <div class="card-header bg-secondary text-white">
+            <h5 class="mb-0">Vos articles</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Titre</th>
+                            <th>Image</th>
+                            <th>Contenu</th>
+                            <th>Catégorie</th>
+                            <th>D. publication</th>
+                            <th>Statut</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($articles as $article): ?>
+                            <tr>
+                                <td><?php echo $article['id']; ?></td>
+                                <td><?php echo htmlspecialchars($article['titre']); ?></td>
+                                <td>
+                                    <?php if ($article['image_upload']): ?>
+                                        <img src="<?php echo '../' . $article['image_upload']; ?>" alt="Image de l'article" class="img-thumbnail" style="max-width: 100px;">
+                                    <?php else: ?>
+                                        <span class="text-muted">Pas d'image</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
+                                    <span class="contenu-preview">
+                                        <?php echo nl2br(($article['contenu'])); ?>
+                                    </span>
+                                </td>
+                                <td><?php echo htmlspecialchars($article['categorie']); ?></td>
+                                <td><?php echo date('d/m/Y H:i', strtotime($article['date_publication'])); ?></td>
+                                <td>
+                                    <span class="badge bg-<?php echo $article['status'] === 'publié' ? 'success' : 'warning'; ?>">
+                                        <?php echo ucfirst($article['status']); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="edit_article.php?id=<?php echo $article['id']; ?>" class="btn btn-sm btn-warning">Modifier</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-4 text-center">
+        <a href="logout.php" class="btn btn-danger">Se déconnecter</a>
+    </div>
+</div>
+
+<!-- JavaScript Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+<!-- JavaScript Summernote -->
+<script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote/dist/summernote-lite.min.js"></script>
 
 <script>
-document.querySelectorAll('.lire-plus').forEach(function(link) {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const parent = this.closest('.contenu-preview');
-        parent.querySelector('.contenu-complet').style.display = 'inline';
-        this.style.display = 'none';
-        parent.querySelector('.lire-moins').style.display = 'inline';
+    $(document).ready(function() {
+        $('#summernote').summernote({
+            height: 300,                 // hauteur de l'éditeur
+            toolbar: [                   // toolbar configuration
+                ['style', ['bold', 'italic', 'underline', 'clear']],
+                ['font', ['strikethrough', 'superscript', 'subscript']],
+                ['fontname', ['fontname']],
+                ['color', ['color']],
+                ['para', ['ul', 'ol', 'paragraph']],
+                ['table', ['table']],
+                ['insert', ['link', 'picture', 'video']],
+                ['view', ['fullscreen', 'codeview', 'help']]
+            ],
+            placeholder: 'Écrivez votre contenu ici...'
+        });
     });
-});
-
-document.querySelectorAll('.lire-moins').forEach(function(link) {
-    link.addEventListener('click', function(e) {
-        e.preventDefault();
-        const parent = this.closest('.contenu-preview');
-        parent.querySelector('.contenu-complet').style.display = 'none';
-        parent.querySelector('.lire-plus').style.display = 'inline';
-        this.style.display = 'none';
-    });
-});
 </script>
+
+</body>
+</html>
+

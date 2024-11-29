@@ -70,148 +70,185 @@ $categories = $pdo->query("SELECT * FROM categories ORDER BY name ASC")->fetchAl
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tableau de Bord Administrateur</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        .contenu-complet { display: none; }
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        header a {
+            transition: all 0.3s ease;
+        }
+
+        header a:hover {
+            background-color: #e0e0e0;
+            color: #000;
+        }
+
+        .table-container {
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+        }
+
+        .table {
+            color: #e0e0e0;
+        }
+
+        .table thead {
+            background-color: #343a40;
+        }
+
+        .table tbody tr {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            transform: scale(1.02);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            background-color: #252525;
+        }
+
+        .content-preview {
+            max-width: 300px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .badge {
+            border-radius: 12px;
+        }
+
+        .btn {
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
-<body>
-    <h1>Bienvenue, <?php echo $_SESSION['admin_username']; ?></h1>
-    <a href="logout.php">Se déconnecter</a>
+<body data-bs-theme="dark">
+    <header class="text-white py-3">
+        <div class="container d-flex justify-content-between align-items-center">
+            <h1 class="h4 mb-0">Bienvenue, <?php echo $_SESSION['admin_username']; ?></h1>
+        </div>
+    </header>
 
-    <!-- Gestion des Articles -->
-    <h2>Gestion des Articles</h2>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Image</th>
-                <th>Titre</th>
-                <th>Contenu</th>
-                <th>Auteur</th>
-                <th>Date de Publication</th>
-                <th>Statut</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($articles as $article) : ?>
-                <tr>
-                    <td><?php echo $article['id']; ?></td>
-                    <td><img src="<?php echo '../' . $article['image_upload']; ?>" alt="Image de l'article" width="100"></td>
-                    <td><?php echo $article['titre']; ?></td>
-                    <td>
-                        <span class="contenu-preview">
-                            <?php 
-                            // Afficher les 500 premiers caractères du contenu
-                            echo substr($article['contenu'], 0, 500); 
-                            ?>
-                            
-                            <?php if (strlen($article['contenu']) > 500): ?>
-                                <a href="#" class="lire-plus" data-id="<?php echo $article['id']; ?>">Lire plus</a>
-                                <span class="contenu-complet" data-id="<?php echo $article['id']; ?>"><?php echo $article['contenu']; ?></span>
-                                <a href="#" class="lire-moins" data-id="<?php echo $article['id']; ?>" style="display: none;">Lire moins</a>
-                            <?php endif; ?>
-                        </span>
-                    </td>
-                    <td><?php echo $article['auteur']; ?></td>
-                    <td><?php echo $article['date_publication']; ?></td>
-                    <td><?php echo $article['status']; ?></td>
-                    <td>
-                        <!-- Lien vers la page de modification -->
-                        <a href="edit_article.php?id=<?php echo $article['id']; ?>">Modifier</a>
-                        <?php if ($article['status'] === 'en attente') : ?>
-                            <form method="POST" style="display: inline;">
-                                <input type="hidden" name="article_id" value="<?php echo $article['id']; ?>">
-                                <button type="submit" name="action" value="publish">Publier</button>
-                            </form>
-                        <?php endif; ?>
-                        <form method="POST" style="display: inline;">
-                            <input type="hidden" name="article_id" value="<?php echo $article['id']; ?>">
-                            <button type="submit" name="action" value="delete">Supprimer</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+    <div class="container my-4">
+        <!-- Gestion des Articles -->
+        <div class="table-container mb-5">
+            <h2 class="mb-3">Gestion des Articles</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Image</th>
+                            <th>Titre</th>
+                            <th>Contenu</th>
+                            <th class="d-none d-md-table-cell">Auteur</th>
+                            <th>D.Publ</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($articles as $article) : ?>
+                            <tr>
+                                <td><?php echo $article['id']; ?></td>
+                                <td><img src="<?php echo '../' . $article['image_upload']; ?>" alt="Image de l'article" class="img-fluid" style="max-width: 80px; border-radius: 5px;"></td>
+                                <td><?php echo htmlspecialchars($article['titre']); ?></td>
+                                <td class="content-preview">
+                                    <?php echo substr($article['contenu'], 0, 100); ?>...
+                                    <a href="#" class="text-primary" data-bs-toggle="tooltip" title="<?php echo htmlspecialchars($article['contenu']); ?>">Lire tout</a>
+                                </td>
+                                <td class="d-none d-md-table-cell"><?php echo htmlspecialchars($article['auteur']); ?></td>
+                                <td><?php echo $article['date_publication']; ?></td>
+                                <td>
+                                    <span class="badge bg-<?php echo $article['status'] === 'publié' ? 'success' : 'warning'; ?>">
+                                        <?php echo ucfirst($article['status']); ?>
+                                    </span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" data-bs-toggle="dropdown">
+                                            Actions
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="edit_article.php?id=<?php echo $article['id']; ?>" class="dropdown-item">Modifier</a></li>
+                                            <?php if ($article['status'] === 'en attente') : ?>
+                                                <li>
+                                                    <form method="POST" class="d-inline">
+                                                        <input type="hidden" name="article_id" value="<?php echo $article['id']; ?>">
+                                                        <button type="submit" name="action" value="publish" class="dropdown-item">Publier</button>
+                                                    </form>
+                                                </li>
+                                            <?php endif; ?>
+                                            <li>
+                                                <form method="POST" class="d-inline">
+                                                    <input type="hidden" name="article_id" value="<?php echo $article['id']; ?>">
+                                                    <button type="submit" name="action" value="delete" class="dropdown-item text-danger">Supprimer</button>
+                                                </form>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <!-- Gestion des Catégories -->
-    <h2>Gestion des Catégories</h2>
-    <?php if (isset($category_message)): ?>
-        <p style="color: green;"><?php echo $category_message; ?></p>
-    <?php endif; ?>
-    
-    <!-- Formulaire d'ajout de catégorie -->
-    <form method="POST">
-        <label for="category_name">Nom de la Catégorie :</label>
-        <input type="text" id="category_name" name="category_name" required>
-        <button type="submit">Ajouter la Catégorie</button>
-    </form>
+        <!-- Gestion des Catégories -->
+        <div class="table-container">
+            <h2 class="mb-3" id="category">Gestion des Catégories</h2>
+            <form method="POST" class="mb-3">
+                <div class="input-group">
+                    <input type="text" id="category_name" name="category_name" class="form-control bg-dark" placeholder="Nom de la Catégorie" required>
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                </div>
+            </form>
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($categories as $category) : ?>
+                            <tr>
+                                <td><?php echo $category['id']; ?></td>
+                                <td><?php echo htmlspecialchars($category['name']); ?></td>
+                                <td>
+                                    <div class="btn-group">
+                                        <a href="edit_category.php?id=<?php echo $category['id']; ?>" class="btn btn-sm btn-warning me-3">Modifier</a>
+                                        <form method="POST" action="delete_category.php" class="d-inline">
+                                            <input type="hidden" name="category_id" value="<?php echo $category['id']; ?>">
+                                            <button type="submit" class="btn btn-sm btn-danger">Supprimer</button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <a href="logout.php" class="btn btn-light mt-4 mb-4 float-end">Se déconnecter</a>
+    </div>
 
-    <!-- Liste des catégories -->
-    <h3>Catégories existantes</h3>
-    <table border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nom</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($categories as $category) : ?>
-                <tr>
-                    <td><?php echo $category['id']; ?></td>
-                    <td><?php echo $category['name']; ?></td>
-                    <td>
-                        <a href="edit_category.php?id=<?php echo $category['id']; ?>">Modifier</a>
-                        <form method="POST" action="delete_category.php" style="display: inline;">
-                            <input type="hidden" name="category_id" value="<?php echo $category['id']; ?>">
-                            <button type="submit">Supprimer</button>
-                        </form>
-                    </td>
-                </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const lirePlusLinks = document.querySelectorAll('.lire-plus');
-        const lireMoinsLinks = document.querySelectorAll('.lire-moins');
-        
-        lirePlusLinks.forEach(link => {
-            link.addEventListener('click', function (event) {
-                event.preventDefault();
-                
-                const id = link.getAttribute('data-id');
-                const contenuComplet = document.querySelector(`.contenu-complet[data-id="${id}"]`);
-                const lirePlus = link;
-                const lireMoins = document.querySelector(`.lire-moins[data-id="${id}"]`);
-                
-                // Afficher le contenu complet
-                contenuComplet.style.display = 'inline';
-                lirePlus.style.display = 'none';
-                lireMoins.style.display = 'inline';
-            });
-        });
-        
-        lireMoinsLinks.forEach(link => {
-            link.addEventListener('click', function (event) {
-                event.preventDefault();
-                
-                const id = link.getAttribute('data-id');
-                const contenuComplet = document.querySelector(`.contenu-complet[data-id="${id}"]`);
-                const lirePlus = document.querySelector(`.lire-plus[data-id="${id}"]`);
-                const lireMoins = link;
-                
-                // Réduire le contenu
-                contenuComplet.style.display = 'none';
-                lirePlus.style.display = 'inline';
-                lireMoins.style.display = 'none';
-            });
-        });
-    });
+        // Activer les tooltips
+        document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
     </script>
 </body>
 </html>

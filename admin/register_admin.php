@@ -56,23 +56,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscription Administrateur</title>
+    <!-- Lien vers Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #343a40; /* Couleur de fond sombre */
+            color: #ffffff; /* Couleur du texte */
+        }
+        .registration-container {
+            max-width: 400px; /* Largeur maximale de la boîte d'inscription */
+            margin: auto; /* Centrer horizontalement */
+            padding: 2rem; /* Espacement interne */
+            border-radius: 10px; /* Coins arrondis */
+            background-color: #495057; /* Couleur de fond du conteneur */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Ombre */
+        }
+    </style>
 </head>
 <body>
-    <h2>Inscription Administrateur</h2>
-    <form method="POST">
-        <label for="username">Nom d'utilisateur :</label>
-        <input type="text" name="username" id="username" required><br>
+    <div class="registration-container mt-5">
+        <h2 class="text-center mb-4">Inscription Administrateur</h2>
+        <form method="POST" action="">
+            <div class="mb-3">
+                <label for="username" class="form-label">Nom d'utilisateur :</label>
+                <input type="text" name="username" id="username" class="form-control bg-dark text-white" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email :</label>
+                <input type="email" name="email" id="email" class="form-control bg-dark text-white" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe :</label>
+                <input type="password" name="password" id="password" class="form-control bg-dark text-white" required>
+            </div>
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label">Confirmez le mot de passe :</label>
+                <input type="password" name="confirm_password" id="confirm_password" class="form-control bg-dark text-white" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">S'inscrire</button>
+        </form>
+    </div>
 
-        <label for="email">Email :</label>
-        <input type="email" name="email" id="email" required><br>
-
-        <label for="password">Mot de passe :</label>
-        <input type="password" name="password" id="password" required><br>
-
-        <label for="confirm_password">Confirmez le mot de passe :</label>
-        <input type="password" name="confirm_password" id="confirm_password" required><br>
-
-        <button type="submit">S'inscrire</button>
-    </form>
+    <!-- Lien vers Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

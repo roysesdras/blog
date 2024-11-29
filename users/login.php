@@ -36,14 +36,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
 
-<form method="POST">
-    <input type="text" name="username" placeholder="Nom d'utilisateur" required>
-    <input type="password" name="password" placeholder="Mot de passe" required>
-    <button type="submit">Se connecter</button>
-</form>
+<style>
+    button{
+        padding: 8px;
+        border: solid 1px #37cb;
+        border-radius: 5px;
+        background-color: #37cb;
+    }
+</style>
 
-<p>vous n'avez pas de compte,<a href="register.php">'enregistrez ici </a></p>
+<body data-bs-theme="dark">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4 pt-5">
+                <h2 class="pb-4">User Login</h2>
+                <form method="POST">
+                    <input type="text" name="username" placeholder="User name" class="form-control mb-3" required>
+
+                    <input type="password" name="password" placeholder="Password"class="form-control mb-4" required>
+
+                    <button type="submit" class="mb-3">Login</button>
+                </form>
+
+                <p>you don't have an account, <a href="register.php">Register here </a></p>
+            </div>
+            <div class="col-md-4"></div>
+        </div>
+    </div>
+    
+
+
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 
 <?php
 if (isset($error)) {

@@ -1,0 +1,14 @@
+.note-editor {
+    background-color: #333; /* Couleur de fond sombre */
+    color: #fff; /* Couleur du texte */
+}
+
+.note-toolbar {
+    background-color: #444; /* Couleur de la barre d'outils */
+    border-bottom: 1px solid #555;
+}
+
+.note-editable {
+    background-color: #222; /* Couleur de la zone éditable */
+    color: #ddd; /* Couleur du texte dans la zone éditable */
+}

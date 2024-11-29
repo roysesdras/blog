@@ -48,7 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
         $stmt = $pdo->prepare($sql);
         $stmt->execute([$category_name, $category_id]);
 
-        $message = "Catégorie mise à jour avec succès.";
+        // Redirection avec message de succès
+        $_SESSION['message'] = "Catégorie mise à jour avec succès.";
+        header('Location: admin_dashboard.php#category'); // Redirige vers le tableau de bord
+        exit();
     } else {
         $message = "Le nom de la catégorie est obligatoire.";
     }
@@ -61,23 +64,48 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['category_name'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modifier la Catégorie</title>
+    <!-- Lien vers Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #343a40; /* Couleur de fond sombre */
+            color: #ffffff; /* Couleur du texte */
+        }
+        .category-container {
+            max-width: 400px; /* Largeur maximale de la boîte de modification */
+            margin: auto; /* Centrer horizontalement */
+            padding: 2rem; /* Espacement interne */
+            border-radius: 10px; /* Coins arrondis */
+            background-color: #495057; /* Couleur de fond du conteneur */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Ombre */
+        }
+    </style>
 </head>
 <body>
-    <h1>Modifier la Catégorie</h1>
+    <div class="category-container mt-5">
+        <h1 class="text-center mb-4">Modifier la Catégorie</h1>
 
-    <!-- Message de confirmation -->
-    <?php if (isset($message)): ?>
-        <p style="color: green;"><?php echo $message; ?></p>
-    <?php endif; ?>
+        <!-- Message de confirmation -->
+        <?php if (isset($message)): ?>
+            <p class="alert alert-danger"><?php echo htmlspecialchars($message); ?></p>
+        <?php endif; ?>
 
-    <!-- Formulaire de modification -->
-    <form method="POST">
-        <label for="category_name">Nom de la Catégorie :</label>
-        <input type="text" id="category_name" name="category_name" value="<?php echo htmlspecialchars($category['name']); ?>" required>
-        <button type="submit">Mettre à jour la Catégorie</button>
-    </form>
+        <!-- Formulaire de modification -->
+        <form method="POST">
+            <div class="mb-3">
+                <label for="category_name" class="form-label">Nom de la Catégorie :</label>
+                <input type="text" id="category_name" name="category_name" 
+                       class="form-control bg-dark text-white" 
+                       value="<?php echo htmlspecialchars($category['name']); ?>" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Mettre à jour la Catégorie</button>
+        </form>
 
-    <br>
-    <a href="admin_dashboard.php">Retour au tableau de bord</a>
+        <!-- <br>
+        <a href="admin_dashboard.php" class="btn btn-secondary w-100">Retour au tableau de bord</a> -->
+    </div>
+
+    <!-- Lien vers Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
